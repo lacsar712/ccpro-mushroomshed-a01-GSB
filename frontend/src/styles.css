@@ -294,6 +294,21 @@ th {
   color: var(--mushroom-brown);
 }
 
+.badge.mist-open {
+  background: #dbeaf7;
+  color: #2c5f8a;
+}
+
+.badge.mist-complete {
+  background: #dceee0;
+  color: #2a6b3f;
+}
+
+.badge.mist-abort {
+  background: #f5dcd8;
+  color: #9c3d31;
+}
+
 .login-page {
   min-height: 100vh;
   display: grid;

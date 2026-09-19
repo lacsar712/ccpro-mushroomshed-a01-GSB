@@ -1,5 +1,6 @@
 export type RoomStatus = 'fruiting' | 'idle' | 'sanitize'
 export type HarvestGrade = 'A' | 'B' | 'C'
+export type MistRampBatchStatus = 'open' | 'complete' | 'abort'
 
 export interface Shed {
   id: number
@@ -35,6 +36,18 @@ export interface FlushHarvest {
   weightKg: number
   grade: HarvestGrade
   operatorName: string
+}
+
+export interface MistRampBatch {
+  id: number
+  roomId: number
+  startHumidity: number
+  targetHumidity: number
+  status: MistRampBatchStatus
+  openedAt: string
+  closedAt?: string | null
+  abortReason?: string | null
+  notes?: string | null
 }
 
 export interface DashboardStats {

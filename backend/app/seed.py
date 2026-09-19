@@ -4,6 +4,7 @@ from app.auth import hash_password
 from app.database import SessionLocal
 from app.models.climate_log import ClimateLog
 from app.models.flush_harvest import FlushHarvest
+from app.models.mist_ramp_batch import MistRampBatch
 from app.models.room import Room
 from app.models.shed import Shed
 from app.models.user import User
@@ -134,6 +135,34 @@ def seed() -> None:
                         weight_kg=55.2,
                         grade="A",
                         operator_name="出菇员",
+                    ),
+                    MistRampBatch(
+                        room_id=r1.id,
+                        start_humidity=80,
+                        target_humidity=95,
+                        status="open",
+                        opened_at=now - timedelta(hours=1),
+                        closed_at=None,
+                        abort_reason=None,
+                        notes="香菇催蕾期雾化补湿爬坡",
+                    ),
+                    MistRampBatch(
+                        room_id=r3.id,
+                        start_humidity=78,
+                        target_humidity=90,
+                        status="complete",
+                        opened_at=now - timedelta(days=2),
+                        closed_at=now - timedelta(days=1),
+                        abort_reason=None,
+                        notes="杏鲍菇原基期补湿",
+                    ),
+                    ClimateLog(
+                        room_id=r3.id,
+                        recorded_at=now - timedelta(days=1),
+                        temp_c=16.0,
+                        humidity_pct=90,
+                        co2_ppm=None,
+                        notes="补湿批次达标完结记录",
                     ),
                 ]
             )

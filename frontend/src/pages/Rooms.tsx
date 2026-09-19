@@ -1,3 +1,4 @@
+import { A } from '@solidjs/router'
 import { createSignal, onMount } from 'solid-js'
 import { For } from 'solid-js'
 import { api } from '../api/client'
@@ -157,6 +158,9 @@ export default function Rooms() {
                     <span class={statusBadge(r.status)}>{r.status}</span>
                   </td>
                   <td>
+                    <A class="btn ghost" href={`/mist-ramp-batches?roomId=${r.id}`}>
+                      补湿批次
+                    </A>
                     <button type="button" class="btn ghost" onClick={() => remove(r.id)}>
                       删除
                     </button>

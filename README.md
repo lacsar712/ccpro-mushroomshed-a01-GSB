@@ -47,13 +47,21 @@ docker compose up --build
 3. **Room 出菇室**：`shedId`、`roomCode`、`species`、`capacityBags`、`status(fruiting|idle|sanitize)`；同菇房 `roomCode` 唯一
 4. **ClimateLog 环境记录**：`roomId`、`recordedAt`、`tempC`、`humidityPct`、`co2Ppm`、`notes`；`humidityPct ∈ [1,100]`，否则 **400**
 5. **FlushHarvest 采收**：`roomId`、`harvestedAt`、`flushNo(≥1)`、`weightKg`、`grade(A|B|C)`、`operatorName`；`weightKg > 0`，否则 **400**
-6. **Dashboard**：`shedTotal`、`fruitingRoomCount`、`climateLast24h`、`harvestKgLast7d`
+6. **MistRampBatch 补湿雾化爬坡批次**（挂在 Room 上）：`roomId`、`startHumidity`、`targetHumidity`、`status(open|complete|abort)`、`openedAt`、`closedAt(可空)`、`abortReason(可空)`、`notes`
+   - `startHumidity < targetHumidity`，且爬坡幅度 `target - start > 30` 时 **400**
+   - 同一出菇室同时只允许一条 `open` 批次；重复开批 **409**，响应体带回 `existingBatchId`
+   - `idle` 室禁止开批（**400**）；`sanitize` 室开批必须填写 `notes`（**400**）
+   - 批次 `open` 期间，该室新建 ClimateLog 的 `humidityPct` 必须落在 `[startHumidity, targetHumidity]` 闭区间，否则 **400**
+   - `POST /api/mist-ramp-batches/<id>/complete`：完结批次并自动写入一条 `humidityPct == targetHumidity` 的 ClimateLog
+   - `POST /api/mist-ramp-batches/<id>/abort`：必须提供中文 `abortReason`（**400**）
+   - 已关闭批次再次 complete/abort 返回 **409**
+7. **Dashboard**：`shedTotal`、`fruitingRoomCount`、`climateLast24h`、`harvestKgLast7d`
 
-各实体 API：`GET/POST` 列表与创建、`DELETE` 按 ID 删除。
+各实体 API：`GET/POST` 列表与创建、`DELETE` 按 ID 删除（MistRampBatch 以 complete/abort 收口，不提供删除）。
 
 ## 前端页面
 
-Login · Dashboard · Sheds · Rooms · ClimateLogs · FlushHarvests（侧边栏布局）
+Login · Dashboard · Sheds · Rooms · ClimateLogs · FlushHarvests · MistRampBatches（侧边栏布局；Rooms 页每行可跳转 `/mist-ramp-batches?roomId=<id>` 查看该室补湿批次）
 
 ## 本地开发（可选）
 
