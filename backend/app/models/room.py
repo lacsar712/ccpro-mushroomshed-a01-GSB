@@ -24,3 +24,6 @@ class Room(Base):
     flush_harvests: Mapped[List["FlushHarvest"]] = relationship(
         "FlushHarvest", back_populates="room", cascade="all, delete-orphan"
     )
+    mist_ramp_batches: Mapped[List["MistRampBatch"]] = relationship(
+        "MistRampBatch", back_populates="room", cascade="all, delete-orphan"
+    )

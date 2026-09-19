@@ -294,6 +294,27 @@ th {
   color: var(--mushroom-brown);
 }
 
+.badge.open {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.badge.complete {
+  background: #dceee0;
+  color: #2a6b3f;
+}
+
+.badge.abort {
+  background: #fdeceb;
+  color: var(--danger);
+}
+
+.row-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
 .login-page {
   min-height: 100vh;
   display: grid;

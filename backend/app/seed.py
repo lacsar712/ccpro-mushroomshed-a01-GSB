@@ -4,6 +4,7 @@ from app.auth import hash_password
 from app.database import SessionLocal
 from app.models.climate_log import ClimateLog
 from app.models.flush_harvest import FlushHarvest
+from app.models.mist_ramp_batch import MistRampBatch
 from app.models.room import Room
 from app.models.shed import Shed
 from app.models.user import User
@@ -134,6 +135,49 @@ def seed() -> None:
                         weight_kg=55.2,
                         grade="A",
                         operator_name="出菇员",
+                    ),
+                    # 补湿批次达标落账:湿度等于 targetHumidity
+                    ClimateLog(
+                        room_id=r3.id,
+                        recorded_at=now - timedelta(days=1),
+                        temp_c=16.0,
+                        humidity_pct=90,
+                        co2_ppm=700.0,
+                        notes="补湿批次达标",
+                    ),
+                ]
+            )
+            db.add_all(
+                [
+                    # open:R-01 香菇二潮前补湿爬坡进行中
+                    MistRampBatch(
+                        room_id=r1.id,
+                        start_humidity=85,
+                        target_humidity=95,
+                        status="open",
+                        opened_at=now - timedelta(hours=1),
+                        notes="香菇二潮前补湿爬坡",
+                    ),
+                    # complete:V-01 已达标关闭
+                    MistRampBatch(
+                        room_id=r3.id,
+                        start_humidity=80,
+                        target_humidity=90,
+                        status="complete",
+                        opened_at=now - timedelta(days=2),
+                        closed_at=now - timedelta(days=1),
+                        notes="杏鲍菇现蕾期提湿",
+                    ),
+                    # abort:V-02 消毒间中止(sanitize 室开批次须填 notes)
+                    MistRampBatch(
+                        room_id=r4.id,
+                        start_humidity=70,
+                        target_humidity=85,
+                        status="abort",
+                        opened_at=now - timedelta(days=3),
+                        closed_at=now - timedelta(days=2),
+                        abort_reason="消毒作业延期,暂停补湿",
+                        notes="消毒间试运行爬坡",
                     ),
                 ]
             )

@@ -4,6 +4,7 @@ from marshmallow import ValidationError
 
 from app.database import SessionLocal
 from app.models.climate_log import ClimateLog
+from app.models.mist_ramp_batch import MistRampBatch
 from app.models.room import Room
 from app.schemas.climate_log import ClimateLogCreateSchema, ClimateLogOutSchema
 from app.utils import validation_error_response
@@ -42,6 +43,25 @@ def create_climate_log():
         room = db.query(Room).filter(Room.id == data["room_id"]).first()
         if not room:
             return jsonify({"detail": "出菇室不存在"}), 400
+        open_batch = (
+            db.query(MistRampBatch)
+            .filter(MistRampBatch.room_id == room.id, MistRampBatch.status == "open")
+            .first()
+        )
+        if open_batch and not (
+            open_batch.start_humidity <= data["humidity_pct"] <= open_batch.target_humidity
+        ):
+            return (
+                jsonify(
+                    {
+                        "detail": (
+                            f"补湿批次 #{open_batch.id} 进行中,humidityPct 须落在 "
+                            f"[{open_batch.start_humidity}, {open_batch.target_humidity}] 闭区间内"
+                        )
+                    }
+                ),
+                400,
+            )
         item = ClimateLog(
             room_id=data["room_id"],
             recorded_at=data["recorded_at"],
